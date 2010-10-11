@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TableLayout android:id="@+id/TableLayout01" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+<TableRow android:id="@+id/TableRow01" android:layout_width="wrap_content" android:layout_height="wrap_content">
+<TextView android:text="company:" android:id="@+id/CompanyTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+<EditText android:text="" android:id="@+id/CompanyEditText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:width="200px"></EditText>
+</TableRow>
+<TableRow android:id="@+id/TableRow02" android:layout_width="wrap_content" android:layout_height="wrap_content">
+<TextView android:text="ID:" android:id="@+id/IdTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+<EditText android:text="" android:id="@+id/IdEditText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:width="200px"></EditText>
+</TableRow>
+<TableRow android:id="@+id/TableRow03" android:layout_width="wrap_content" android:layout_height="wrap_content">
+<TextView android:text="password:" android:id="@+id/PasswordTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+<EditText android:text="" android:id="@+id/PasswordEditText" android:layout_width="fill_parent" android:layout_height="wrap_content" android:password="true" android:width="200px"></EditText>
+</TableRow>
+<TableRow android:id="@+id/TableRow01" android:layout_width="wrap_content" android:layout_height="wrap_content">
+</TableRow>
+<Button android:text="regist" android:id="@+id/RegistButton" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+</TableLayout>
