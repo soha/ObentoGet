@@ -2,5 +2,5 @@
 <resources>
     
     <string name="app_name">ObentoGet</string>
-<string name="ExecuteButton">注文</string>
+<string name="OrderButton">注文</string>
 </resources>

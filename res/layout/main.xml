@@ -6,5 +6,5 @@
     android:gravity="center"
     >
 
-<Button android:text="@+string/ExecuteButton" android:id="@+id/ExecuteButton" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+<Button android:text="@+string/OrderButton" android:id="@+id/OrderButton" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
 </LinearLayout>

@@ -35,7 +35,7 @@ public class ConfigActivity extends Activity implements OnClickListener {
 		registButton.setOnClickListener(this);
 		
 		
-		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 		companyCdEdit.setText(pref.getString(COMPANY_CD, ""));
 		customerCdEdit.setText(pref.getString(CUSTOMER_CD, ""));
 		passwordEdit.setText(pref.getString(PASSWORD, ""));
@@ -44,7 +44,7 @@ public class ConfigActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
 		SharedPreferences.Editor editor = pref.edit();
 		editor.putString(COMPANY_CD, companyCdEdit.getText().toString());
 		editor.putString(CUSTOMER_CD, customerCdEdit.getText().toString());
