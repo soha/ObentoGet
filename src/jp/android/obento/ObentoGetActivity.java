@@ -6,10 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -28,8 +26,6 @@ import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -45,10 +41,13 @@ import android.widget.Toast;
 
 public class ObentoGetActivity extends Activity implements OnClickListener {
 
-	// protected static final String SITE_TOP_URL = "http://www.obentonet.com";
+	protected static final String SITE_TOP_SSL_URL = "https://www.obentonet.com";
+	protected static final String ORDER_TOP_SSL_URL = "https://www.obentonet.com/order_lunch";
+	protected static final String ORDER_PART = "lunch_order.asp";
 	protected static final String LOGIN_URL = "https://www.obentonet.com/login/";
 	protected static final String LOGIN_POST_URL = "https://www.obentonet.com/login/LoginExec.asp";
 	protected static final String LUNCH_DAILY_LINK = "/order_lunch/lunch_daily.asp";
+	protected static final String LOGOUT_URL = "https://www.obentonet.com/logout.asp";
 	
 
 	private static final String COMPANY_CD = "CompanyCD";
@@ -121,34 +120,89 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 		        while ((line = br.readLine()) != null) {
 		        	sb.append(line);
 		        }
+		        br.close();
 	        	String html = sb.toString();
 	        	if(html.contains(LUNCH_DAILY_LINK)){
-	    			HttpGet lunchDailyGet = new HttpGet(LUNCH_DAILY_LINK);
+	    			HttpGet lunchDailyGet = new HttpGet(SITE_TOP_SSL_URL + LUNCH_DAILY_LINK);
 	    			HttpResponse lunchDailyRes = httpclient.execute(lunchDailyGet); // 注文画面
 	    			InputStream is = lunchDailyRes.getEntity().getContent();
 	    			
-					DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-					DocumentBuilder db;
-					Document doc;
-					try {
-						db = dbf.newDocumentBuilder();
-						doc = db.parse(is);
-					} catch (IllegalStateException e1) {
-						// TODO 自動生成された catch ブロック
-						e1.printStackTrace();
-						return;
-					} catch (SAXException e1) {
-						// TODO 自動生成された catch ブロック
-						e1.printStackTrace();
-						return;
-					} catch (IOException e1) {
-						// TODO 自動生成された catch ブロック
-						e1.printStackTrace();
-						return;
-					} catch (ParserConfigurationException e) {
-						// TODO 自動生成された catch ブロック
-						e.printStackTrace();
-					}
+					br = new BufferedReader(new InputStreamReader(is, ENCODE));
+			        sb = new StringBuffer();
+			        while ((line = br.readLine()) != null) {
+			        	sb.append(line);
+			        }
+			        br.close();
+			        is.close();
+			        String orderPage = sb.toString();
+
+	    			Pattern ptn = Pattern.compile("<a.*?href=\"(.*?)\".*?>(.*?)</a>", Pattern.DOTALL);
+	    			
+	    			Matcher matcher = ptn.matcher(orderPage);
+
+	    			String href = "";
+	    			while (matcher.find()) {
+	    				//注文リンクの抽出（最後のAタグのhrefを使う）
+	    			    href = matcher.group(1).replaceAll("¥¥s", "");
+	    			    //String text = matcher.group(2).replaceAll("¥¥s", "");
+	    			    if(href.contains(ORDER_PART)){
+	    			    	break;
+	    			    }
+	    			}
+
+	    			HttpGet orderGet = new HttpGet(ORDER_TOP_SSL_URL + "/" + href);
+	    			HttpResponse orderGetRes = httpclient.execute(orderGet); // 注文確定画面へ
+	    			
+	    			//注文確定POST
+	    			is = orderGetRes.getEntity().getContent();
+	    			
+					br = new BufferedReader(new InputStreamReader(is, ENCODE));
+			        sb = new StringBuffer();
+			        while ((line = br.readLine()) != null) {
+			        	sb.append(line);
+			        }
+			        br.close();
+			        String orderDecidePage = sb.toString();
+	    			ptn = Pattern.compile("<form.*?action=\"(.*?)\".*?>(.*?)>", Pattern.DOTALL);
+	    			matcher = ptn.matcher(orderDecidePage);
+	    			String posturl = "";
+	    			while (matcher.find()) {
+	    				//注文リンクの抽出（最後のAタグのhrefを使う）
+	    			    posturl = matcher.group(1).replaceAll("¥¥s", "");
+	    			    //String text = matcher.group(2).replaceAll("¥¥s", "");
+	    			}
+//	    	        <input type="hidden" name="LunchCompanyBranchID" value="1">
+//	    	        <input type="hidden" name="OrderMenuID" value="1">
+//	    	        <input type="hidden" name="Price" value="460">
+//	    	        <input type="hidden" name="DeadLine" value="9:50:00">
+//	    			<input type="checkbox" name="Confirm">
+	    			HttpPost orderDecidePost = new HttpPost(ORDER_TOP_SSL_URL + "/" +  posturl);
+	    			
+	    			nameValuePairs = new ArrayList<NameValuePair>(2);
+	    			nameValuePairs.add(new BasicNameValuePair("LunchCompanyBranchID", "1"));
+	    			nameValuePairs.add(new BasicNameValuePair("OrderMenuID", "1"));
+	    			nameValuePairs.add(new BasicNameValuePair("Price", "460"));
+	    			nameValuePairs.add(new BasicNameValuePair("DeadLine", "9:50:00"));
+	    			nameValuePairs.add(new BasicNameValuePair("Confirm", ""));
+	    			nameValuePairs.add(new BasicNameValuePair("Quantity", "1"));
+	    			nameValuePairs.add(new BasicNameValuePair("DeliveryID", "1060")); //TODO 画面から取得した方がよい
+	    			orderDecidePost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+	    			// Execute HTTP Post Request
+	    			HttpResponse orderResponse = httpclient.execute(orderDecidePost);
+			        
+			        
+	    			
+	    			HttpGet logout = new HttpGet(LOGOUT_URL);
+	    			HttpResponse logoutRes = httpclient.execute(logout); // ログアウト
+
+			        sb = new StringBuffer();
+			        br = new BufferedReader(new InputStreamReader(logoutRes.getEntity().getContent(), ENCODE));
+			        while ((line = br.readLine()) != null) {
+			        	sb.append(line);
+			        }
+			        br.close();
+
 	        	}
 		        Toast.makeText(this, sb.toString(), 0).show();
 	        	
