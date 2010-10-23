@@ -55,7 +55,12 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 
 	private static final String ENCODE = "SJIS";
 	private static final int HTTP_OK = 200;
+	private static final String OK_CODE = "OK";
+	private static final String DETAIL_PAGE_CONTENTS_KEY = "html";
 
+	Button orderButton;
+	Button detailButton;
+	
 	/**
 	 * Activity生成時
 	 */
@@ -64,15 +69,22 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		Button orderButton = (Button) findViewById(R.id.OrderButton);
+		orderButton = (Button) findViewById(R.id.OrderButton);
 		orderButton.setOnClickListener(this);
+		detailButton = (Button) findViewById(R.id.DetailButton);
+		detailButton.setOnClickListener(this);
 	}
 
 	@Override
 	public void onClick(View v) {
 
-		OrderRequestTask task = new OrderRequestTask(this);
-		task.execute();
+		if(v == orderButton) {
+			OrderRequestTask task = new OrderRequestTask(this);
+			task.execute();
+		}else if(v == detailButton){
+			CheckOrderRequestTask task = new CheckOrderRequestTask(this);
+			task.execute();
+		}
 	}
 
 	public class OrderRequestTask extends AsyncTask<String, Integer, String> {
@@ -276,11 +288,149 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(String result) {
 			progressDialog.dismiss(); // プログレスバー消す
-			Toast.makeText(activity, result, Toast.LENGTH_LONG).show();
+			Toast.makeText(activity, "注文完了", Toast.LENGTH_LONG).show();
 
 		}
 
 	}
+	
+	/**
+	 * 注文はせず注文情報画面を表示するのみ
+	 * @author you
+	 *
+	 */
+	public class CheckOrderRequestTask extends AsyncTask<String, Integer, String> {
+
+		Activity activity;
+		ProgressDialog progressDialog;
+		String orderPageHtml;
+
+		public CheckOrderRequestTask(Activity activity) {
+			this.activity = activity;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			// プログレスバー設定
+			progressDialog = new ProgressDialog(activity);
+			progressDialog.setTitle("確認中");
+			progressDialog.setIndeterminate(false);
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			// progressDialog.setMax(100); // 進捗最大値を設定
+
+			progressDialog.show();
+		}
+
+		@Override
+		protected String doInBackground(String... taskParams) {
+
+			SchemeRegistry schemeRegistry = new SchemeRegistry();
+			schemeRegistry.register(new Scheme("https", SSLSocketFactory
+					.getSocketFactory(), 443));
+
+			HttpParams params = new BasicHttpParams();
+			params.setParameter(ClientPNames.COOKIE_POLICY,
+					CookiePolicy.BROWSER_COMPATIBILITY);
+
+			SingleClientConnManager mgr = new SingleClientConnManager(params,
+					schemeRegistry);
+
+			HttpClient httpclient = new DefaultHttpClient(mgr, params);
+
+			SharedPreferences pref = PreferenceManager
+					.getDefaultSharedPreferences(this.activity
+							.getApplicationContext());
+
+			String responseStr = "";
+
+			try {
+				HttpGet httpget = new HttpGet(LOGIN_URL);
+				// ログイン画面表示
+				HttpResponse res = httpclient.execute(httpget);
+				int statusCode = res.getStatusLine().getStatusCode();
+				if (statusCode != HTTP_OK) {
+					return "アクセスエラー発生";
+				}
+
+				HttpPost httppost = new HttpPost(LOGIN_POST_URL);
+
+				// Add your data
+				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(
+						2);
+				nameValuePairs.add(new BasicNameValuePair(COMPANY_CD, pref
+						.getString(COMPANY_CD, "")));
+				nameValuePairs.add(new BasicNameValuePair(CUSTOMER_CD, pref
+						.getString(CUSTOMER_CD, "")));
+				nameValuePairs.add(new BasicNameValuePair(PASSWORD, pref
+						.getString(PASSWORD, "")));
+				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+				// Execute HTTP Post Request
+				HttpResponse response = httpclient.execute(httppost);
+				statusCode = response.getStatusLine().getStatusCode();
+				if (statusCode != HTTP_OK) {
+					return "レスポンスエラー発生";
+				}
+
+				// 注 レスポンスが返って来ただけで認証成功とは限らない
+				BufferedReader br = new BufferedReader(new InputStreamReader(
+						response.getEntity().getContent(), ENCODE));
+				String line = null;
+				StringBuffer sb = new StringBuffer();
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+				}
+				br.close();
+				String html = sb.toString();
+				if (!html.contains(LUNCH_DAILY_LINK)) {
+					return "認証失敗";
+				}else{
+					// 注文画面へのリンクが返って来たなら認証成功とみなし、処理を続ける
+					HttpGet lunchDailyGet = new HttpGet(SITE_TOP_SSL_URL
+							+ LUNCH_DAILY_LINK);
+					HttpResponse lunchDailyRes = httpclient
+							.execute(lunchDailyGet); // 注文画面
+					InputStream is = lunchDailyRes.getEntity().getContent();
+
+					br = new BufferedReader(new InputStreamReader(is, ENCODE));
+					sb = new StringBuffer();
+					while ((line = br.readLine()) != null) {
+						sb.append(line);
+					}
+					br.close();
+					is.close();
+					orderPageHtml = sb.toString();
+
+					// 先にログアウト処理しておく
+					HttpGet logout = new HttpGet(LOGOUT_URL);
+					httpclient.execute(logout); // ログアウト
+
+
+					return OK_CODE;
+				}
+
+
+			} catch (Exception e) {
+				return "エラー発生";
+			}
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			progressDialog.dismiss(); // プログレスバー消す
+			Toast.makeText(activity, result, Toast.LENGTH_LONG).show();
+			
+			if(OK_CODE.equals(result)){
+				//注文画面を表示
+				Intent intent = new Intent(ObentoGetActivity.this, OrderDetailActivity.class);
+				intent.putExtra(DETAIL_PAGE_CONTENTS_KEY, orderPageHtml);
+				startActivity(intent);
+			}
+		}
+
+	}
+	
+	
 
 	/**
 	 * オプションメニュー作成

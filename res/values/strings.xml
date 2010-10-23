@@ -3,4 +3,5 @@
     
     <string name="app_name">ObentoGet</string>
 <string name="OrderButton">注文</string>
+<string name="DetailButton">閲覧</string>
 </resources>
