@@ -100,7 +100,7 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 		protected void onPreExecute() {
 			// プログレスバー設定
 			progressDialog = new ProgressDialog(activity);
-			progressDialog.setTitle("注文厨");
+			progressDialog.setTitle("注文中");
 			progressDialog.setIndeterminate(false);
 			progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			// progressDialog.setMax(100); // 進捗最大値を設定
@@ -277,7 +277,8 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 					HttpGet logout = new HttpGet(LOGOUT_URL);
 					httpclient.execute(logout); // ログアウト
 
-					return responseStr;
+					//return responseStr;
+					return "注文完了";
 				}
 
 			} catch (Exception e) {
@@ -288,7 +289,7 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 		@Override
 		protected void onPostExecute(String result) {
 			progressDialog.dismiss(); // プログレスバー消す
-			Toast.makeText(activity, "注文完了", Toast.LENGTH_LONG).show();
+			Toast.makeText(activity, result, Toast.LENGTH_LONG).show();
 
 		}
 
@@ -341,7 +342,7 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 					.getDefaultSharedPreferences(this.activity
 							.getApplicationContext());
 
-			String responseStr = "";
+			//String responseStr = "";
 
 			try {
 				HttpGet httpget = new HttpGet(LOGIN_URL);
