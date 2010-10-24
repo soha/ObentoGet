@@ -57,6 +57,7 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 	private static final int HTTP_OK = 200;
 	private static final String OK_CODE = "OK";
 	private static final String DETAIL_PAGE_CONTENTS_KEY = "html";
+	
 
 	Button orderButton;
 	Button detailButton;
@@ -102,9 +103,10 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 			progressDialog = new ProgressDialog(activity);
 			progressDialog.setTitle("注文中");
 			progressDialog.setIndeterminate(false);
-			progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			// progressDialog.setMax(100); // 進捗最大値を設定
-
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			progressDialog.setMax(100); // 進捗最大値を設定
+			progressDialog.incrementProgressBy(0);
+			
 			progressDialog.show();
 		}
 
@@ -133,7 +135,9 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 			try {
 				HttpGet httpget = new HttpGet(LOGIN_URL);
 				// ログイン画面表示
+				progressDialog.incrementProgressBy(10);
 				HttpResponse res = httpclient.execute(httpget);
+				progressDialog.incrementProgressBy(20);
 				int statusCode = res.getStatusLine().getStatusCode();
 				if (statusCode != HTTP_OK) {
 					return "アクセスエラー発生";
@@ -153,7 +157,9 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 				// Execute HTTP Post Request
+				progressDialog.incrementProgressBy(30);
 				HttpResponse response = httpclient.execute(httppost);
+				progressDialog.incrementProgressBy(40);
 				statusCode = response.getStatusLine().getStatusCode();
 				if (statusCode != HTTP_OK) {
 					return "レスポンスエラー発生";
@@ -175,8 +181,10 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 					// 注文画面へのリンクが返って来たなら認証成功とみなし、処理を続ける
 					HttpGet lunchDailyGet = new HttpGet(SITE_TOP_SSL_URL
 							+ LUNCH_DAILY_LINK);
-					HttpResponse lunchDailyRes = httpclient
-							.execute(lunchDailyGet); // 注文画面
+					progressDialog.incrementProgressBy(50);
+					HttpResponse lunchDailyRes = httpclient.execute(lunchDailyGet); // 注文画面
+					progressDialog.incrementProgressBy(60);
+					
 					InputStream is = lunchDailyRes.getEntity().getContent();
 
 					br = new BufferedReader(new InputStreamReader(is, ENCODE));
@@ -194,20 +202,27 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 					Matcher matcher = ptn.matcher(orderPage);
 
 					String href = "";
+					boolean canOrder = false;
 					while (matcher.find()) {
 						// 注文確定画面へのリンクの抽出（最後のAタグのhrefを使う）
 						href = matcher.group(1).replaceAll("¥¥s", "");
 						// String text = matcher.group(2).replaceAll("¥¥s",
 						// "");
 						if (href.contains(ORDER_PART)) {
+							canOrder = true;
 							break;
 						}
 					}
 
+					if(!canOrder){
+						return "注文できません";
+					}
 					HttpGet orderGet = new HttpGet(ORDER_TOP_SSL_URL + "/"
 							+ href);
+					progressDialog.incrementProgressBy(70);
 					HttpResponse orderGetRes = httpclient.execute(orderGet); // 注文確定画面へ
-
+					progressDialog.incrementProgressBy(80);
+					
 					// 注文確定POST処理ここから
 					is = orderGetRes.getEntity().getContent();
 
@@ -257,8 +272,11 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 								nameValuePairs));
 
 						// 注文確定
+						progressDialog.incrementProgressBy(90);
 						HttpResponse orderResponse = httpclient
 								.execute(orderDecidePost);
+						progressDialog.incrementProgressBy(95);
+						
 						sb = new StringBuffer();
 						br = new BufferedReader(new InputStreamReader(
 								orderResponse.getEntity().getContent(), ENCODE));
@@ -275,7 +293,9 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 
 					// ログアウト処理
 					HttpGet logout = new HttpGet(LOGOUT_URL);
+					progressDialog.incrementProgressBy(95);
 					httpclient.execute(logout); // ログアウト
+					progressDialog.incrementProgressBy(100);
 
 					//return responseStr;
 					return "注文完了";
