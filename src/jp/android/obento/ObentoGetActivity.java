@@ -49,14 +49,14 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 	protected static final String LUNCH_DAILY_LINK = "/order_lunch/lunch_daily.asp";
 	protected static final String LOGOUT_URL = "https://www.obentonet.com/logout.asp";
 
-	private static final String COMPANY_CD = "CompanyCD";
-	private static final String CUSTOMER_CD = "CustomerCD";
-	private static final String PASSWORD = "Password";
+	protected static final String COMPANY_CD = "CompanyCD";
+	protected static final String CUSTOMER_CD = "CustomerCD";
+	protected static final String PASSWORD = "Password";
 
-	private static final String ENCODE = "SJIS";
-	private static final int HTTP_OK = 200;
-	private static final String OK_CODE = "OK";
-	private static final String DETAIL_PAGE_CONTENTS_KEY = "html";
+	protected static final String ENCODE = "SJIS";
+	protected static final int HTTP_OK = 200;
+	protected static final String OK_CODE = "OK";
+	protected static final String DETAIL_PAGE_CONTENTS_KEY = "html";
 	
 
 	Button orderButton;
@@ -129,8 +129,6 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 			SharedPreferences pref = PreferenceManager
 					.getDefaultSharedPreferences(this.activity
 							.getApplicationContext());
-
-			String responseStr = "";
 
 			try {
 				HttpGet httpget = new HttpGet(LOGIN_URL);
@@ -284,7 +282,6 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 							sb.append(line);
 						}
 						br.close();
-						responseStr = sb.toString();
 
 					} else {
 						// POST先URLが取得できないのは想定外ページに遷移したということ
