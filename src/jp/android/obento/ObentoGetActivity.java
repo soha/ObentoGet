@@ -40,6 +40,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class ObentoGetActivity extends Activity implements OnClickListener {
+	
+	public static final String TIMER = "jp.android.ObentGet.Intent.Timer";
+	public static final String ON_TIMER = "onTimer";
 
 	protected static final String SITE_TOP_SSL_URL = "https://www.obentonet.com";
 	protected static final String ORDER_TOP_SSL_URL = "https://www.obentonet.com/order_lunch";

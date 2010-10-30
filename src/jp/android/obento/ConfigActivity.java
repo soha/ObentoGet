@@ -83,9 +83,8 @@ public class ConfigActivity extends Activity implements OnClickListener {
 
 			// AlarmManagerのインスタンスを取得
 			AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-			PendingIntent sender = PendingIntent.getActivity(
-					ConfigActivity.this, 0, new Intent(ConfigActivity.this,
-							OtokomaeObentoGetActivity.class),
+			Intent intent = new Intent(ObentoGetActivity.TIMER);
+			PendingIntent sender = PendingIntent.getBroadcast(ConfigActivity.this, 0, intent,
 					PendingIntent.FLAG_CANCEL_CURRENT);
 
 			if(alarmCheckBox.isChecked()){
