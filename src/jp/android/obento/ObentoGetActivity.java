@@ -460,6 +460,7 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean ret = super.onCreateOptionsMenu(menu);
 		menu.add(0, Menu.FIRST, Menu.NONE, "AccountSettings");
+		menu.add(0, Menu.FIRST+1, Menu.NONE, "Check");
 
 		return ret;
 	}
@@ -470,8 +471,13 @@ public class ObentoGetActivity extends Activity implements OnClickListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
-		Intent intent = new Intent(this, jp.android.obento.ConfigActivity.class);
-		startActivityForResult(intent, 0);
+		if(item.getItemId() ==  Menu.FIRST){
+			Intent intent = new Intent(this, jp.android.obento.ConfigActivity.class);
+			startActivityForResult(intent, 0);
+		}else{
+			CheckOrderRequestTask task = new CheckOrderRequestTask(this);
+			task.execute();
+		}
 
 		return super.onOptionsItemSelected(item);
 	}
