@@ -2,59 +2,74 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     android:gravity="center"
     >
 
-<TableLayout android:id="@+id/TableLayout01" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-<TableRow android:id="@+id/TableRow01" android:layout_width="fill_parent" android:layout_height="wrap_content">
-    <TextView
-    	android:layout_width="wrap_content"
+
+        <TextView
+    	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:layout_gravity="center_horizontal"
     	android:text="ログイン情報を入力してください"
     	android:textSize="18dip"
     	android:layout_span="2"
 		/>
-</TableRow>
-<TableRow android:id="@+id/TableRow01" android:layout_width="fill_parent" android:layout_height="wrap_content">
-	<TextView 
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    >
+    <TextView 
 		android:text="companyCd:" 
 		android:id="@+id/CompanyCdTextView" 
 		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content">
+		android:layout_height="wrap_content"
+		android:width="120px">
 	</TextView>
 	<EditText 
 		android:text="" 
 		android:id="@+id/CompanyCdEditText" 
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
-		android:width="200px"
 		android:singleLine="true">
 	</EditText>
-</TableRow>
-<TableRow android:id="@+id/TableRow02" android:layout_width="fill_parent" android:layout_height="wrap_content">
+</LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    >
 	<TextView 
 		android:text="LoginId:" 
 		android:id="@+id/CustomerCdTextView" 
 		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content">
+		android:layout_height="wrap_content"
+		android:width="120px">
 	</TextView>
 	<EditText 
 		android:text="" 
 		android:id="@+id/CustomerCdEditText" 
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
-		android:width="200px"
 		android:singleLine="true">
 	</EditText>
-</TableRow>
-<TableRow android:id="@+id/TableRow03" android:layout_width="fill_parent" android:layout_height="wrap_content">
+</LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    >
 	<TextView 
 		android:text="password:" 
 		android:id="@+id/PasswordTextView" 
 		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content">
+		android:layout_height="wrap_content"
+		android:width="120px">
 	</TextView>
 	<EditText 
 		android:text="" 
@@ -62,12 +77,15 @@
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
 		android:password="true" 
-		android:width="200px"
 		android:singleLine="true">
 	</EditText>
-</TableRow>
-
-<TableRow android:id="@+id/TableRow10" android:layout_width="fill_parent" android:layout_height="wrap_content">
+</LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    >
 	<CheckBox 
 		android:text="アラーム設定する" 
 		android:id="@+id/AlarmCheckBox" 
@@ -75,26 +93,29 @@
 		android:layout_height="wrap_content"
 		android:layout_span="2">
 	</CheckBox>
-</TableRow>
-<TableRow android:id="@+id/TableRow11" android:layout_width="fill_parent" android:layout_height="wrap_content">
+</LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    >
     <TimePicker
     	android:id="@+id/setting_time"
     	android:layout_width="wrap_content"
     	android:layout_height="wrap_content"
     	android:layout_gravity="center_horizontal"
     	android:layout_span="2"
-    	/>
-</TableRow>
+    	>
+    </TimePicker>
+</LinearLayout>
 
-<TableRow android:id="@+id/TableRow99" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_span="2">
 	<Button
 		android:text="regist" 
 		android:id="@+id/RegistButton" 
-		android:layout_width="wrap_content" 
+		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content"
 		android:layout_span="2">
 	</Button>
-</TableRow>
-</TableLayout>
 
 </LinearLayout>
